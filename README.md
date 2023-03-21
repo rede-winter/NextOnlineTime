@@ -12,14 +12,14 @@ OnlineTimePlus, [vídeo demonstrativo](https://www.youtube.com/watch?v=8naKKD7pa
 
 ## Comandos
 
-|Comando               |Descrição           |Permissão             |
-|----------------------|--------------------|----------------------|
-|/tempo                |Exibe todos os sub-comandos do plugin|`Nenhuma`|
-|/tempo ver            |Exibe o tempo online de um jogador, caso não insira nenhum, mostrará o seu|`Nenhuma`|
-|/tempo menu           |Menu do sistema, mostrando as recompensas, top jogadores, opção de filtro e seu tempo online|`Nenhuma`
-|/tempo enviar         |Enviar tempo online a um jogador|`nextonlinetime.sendtime`|
-|/tempo setnpc         |Setar o npc do sistema de tempo online|`nextonlinetime.admin`|
-|/conversion           |Converte os dados do plugin selecionado|`nextonlinetime.admin`|
+| Comando       | Descrição                                                                                    | Permissão                 |
+|---------------|----------------------------------------------------------------------------------------------|---------------------------|
+| /tempo        | Exibe todos os sub-comandos do plugin                                                        | `Nenhuma`                 |
+| /tempo ver    | Exibe o tempo online de um jogador, caso não insira nenhum, mostrará o seu                   | `Nenhuma`                 |
+| /tempo menu   | Menu do sistema, mostrando as recompensas, top jogadores, opção de filtro e seu tempo online | `Nenhuma`                 
+| /tempo enviar | Enviar tempo online a um jogador                                                             | `nextonlinetime.sendtime` |
+| /tempo setnpc | Setar o npc do sistema de tempo online                                                       | `nextonlinetime.admin`    |
+| /conversion   | Converte os dados do plugin selecionado                                                      | `nextonlinetime.admin`    |
 
 ## Download
 
@@ -33,6 +33,7 @@ e `rewards.yml`, em que você pode configurar o sql, recompensas, modo de funcio
 opções.
 
 ## Dependências
+
 Caso queira usar o sistema de **NPC** os plugins `Citizens` e `HolographicDisplays` serão necessários
 
 ## Placeholders

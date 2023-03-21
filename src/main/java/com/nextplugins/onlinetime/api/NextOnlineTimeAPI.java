@@ -20,13 +20,14 @@ import java.util.stream.Collectors;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NextOnlineTimeAPI {
 
-    @Getter private static final NextOnlineTimeAPI instance = new NextOnlineTimeAPI();
+    @Getter
+    private static final NextOnlineTimeAPI instance = new NextOnlineTimeAPI();
 
-    private final TimedPlayerManager timedPlayerManager = NextOnlineTime.getInstance().getTimedPlayerManager();
+    private final TimedPlayerManager timedPlayerManager =
+            NextOnlineTime.getInstance().getTimedPlayerManager();
     private final RewardManager rewardManager = NextOnlineTime.getInstance().getRewardManager();
 
     /**
@@ -57,8 +58,8 @@ public final class NextOnlineTimeAPI {
      */
     public Set<Reward> getRewardsByMinTime(long millis) {
         return allCachedRewards().stream()
-            .filter(time -> time.getTime() >= millis)
-            .collect(Collectors.toSet());
+                .filter(time -> time.getTime() >= millis)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -73,9 +74,7 @@ public final class NextOnlineTimeAPI {
      * @return {@link Optional} with the player found
      */
     public Optional<TimedPlayer> findPlayerByFilter(Predicate<TimedPlayer> filter) {
-        return allCachedPlayers().stream()
-            .filter(filter)
-            .findAny();
+        return allCachedPlayers().stream().filter(filter).findAny();
     }
 
     /**
@@ -95,5 +94,4 @@ public final class NextOnlineTimeAPI {
     public Collection<Reward> allCachedRewards() {
         return ImmutableSet.copyOf(this.rewardManager.getRewards().values());
     }
-
 }

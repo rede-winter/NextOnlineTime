@@ -69,12 +69,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder setLore(List<String> lore) {
-        return changeItemMeta(it -> it.setLore(
-            lore
-                .stream()
-                .map(ColorUtil::colored)
-                .collect(Collectors.toList()))
-        );
+        return changeItemMeta(
+                it -> it.setLore(lore.stream().map(ColorUtil::colored).collect(Collectors.toList())));
     }
 
     public ItemBuilder addLore(List<String> lore) {
@@ -90,5 +86,4 @@ public class ItemBuilder {
     public ItemStack wrap() {
         return item;
     }
-
 }

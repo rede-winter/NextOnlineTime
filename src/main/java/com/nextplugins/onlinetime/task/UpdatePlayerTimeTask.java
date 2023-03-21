@@ -20,9 +20,6 @@ public class UpdatePlayerTimeTask implements Runnable {
 
             timedPlayer.addTime(System.currentTimeMillis() - timedPlayer.getLastUpdateTime());
             timedPlayer.setLastUpdateTime(System.currentTimeMillis());
-
         }
-
     }
-
 }

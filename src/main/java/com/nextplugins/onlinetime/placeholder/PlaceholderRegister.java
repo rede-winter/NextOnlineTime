@@ -16,7 +16,6 @@ import java.util.List;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @AllArgsConstructor(staticName = "of")
 public final class PlaceholderRegister extends PlaceholderExpansion {
 
@@ -54,6 +53,5 @@ public final class PlaceholderRegister extends PlaceholderExpansion {
 
         TimedPlayer timedPlayer = this.plugin.getTimedPlayerManager().getByName(player.getName());
         return TimeUtils.formatOne(timedPlayer.getTimeInServer());
-
     }
 }

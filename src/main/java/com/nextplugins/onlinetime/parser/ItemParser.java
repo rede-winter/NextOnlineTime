@@ -13,7 +13,6 @@ import java.util.List;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 public final class ItemParser {
 
     public ItemStack parseSection(ConfigurationSection section) {
@@ -23,12 +22,9 @@ public final class ItemParser {
             ItemBuilder itemBuilder;
 
             if (section.contains("head")) itemBuilder = new ItemBuilder(section.getString("head"));
-
             else {
                 itemBuilder = new ItemBuilder(TypeUtil.convertFromLegacy(
-                    section.getString("material"),
-                    section.contains("data") ? (short) section.getInt("data") : 0)
-                );
+                        section.getString("material"), section.contains("data") ? (short) section.getInt("data") : 0));
             }
 
             if (section.contains("name")) itemBuilder.name(ColorUtil.colored(section.getString("name")));
@@ -50,9 +46,6 @@ public final class ItemParser {
 
             throwable.printStackTrace();
             return null;
-
         }
-
     }
-
 }

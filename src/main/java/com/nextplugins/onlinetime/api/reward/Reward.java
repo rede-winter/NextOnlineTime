@@ -10,7 +10,6 @@ import java.util.List;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @Data
 @Builder
 public class Reward {
@@ -25,5 +24,4 @@ public class Reward {
 
     private final List<String> description;
     private final List<String> commands;
-
 }

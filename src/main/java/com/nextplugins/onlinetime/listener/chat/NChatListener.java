@@ -23,10 +23,6 @@ public final class NChatListener implements Listener {
 
         val timeFormatted = TimeUtils.formatOneLetter(timeInServer);
 
-        event.setTagValue(
-            "online_time",
-            timeFormatted
-        );
+        event.setTagValue("online_time", timeFormatted);
     }
-
 }

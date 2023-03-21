@@ -14,5 +14,4 @@ public class RewardComparator implements Comparator<Reward> {
     public int compare(Reward o1, Reward o2) {
         return Long.compare(o1.getTime(), o2.getTime());
     }
-
 }

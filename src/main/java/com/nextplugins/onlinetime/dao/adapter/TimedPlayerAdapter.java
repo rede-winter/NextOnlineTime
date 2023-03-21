@@ -11,17 +11,15 @@ public final class TimedPlayerAdapter implements SQLResultAdapter<TimedPlayer> {
         String userName = resultSet.get("name");
         int timeInServer = resultSet.get("time");
 
-        TimedPlayer timedPlayer = TimedPlayer.builder()
-            .name(userName)
-            .timeInServer(timeInServer)
-            .build();
+        TimedPlayer timedPlayer =
+                TimedPlayer.builder().name(userName).timeInServer(timeInServer).build();
 
         String collectedRewards = resultSet.get("collectedRewards");
         if (collectedRewards.equalsIgnoreCase("")) return timedPlayer;
 
-        for (String name : collectedRewards.split(",")) timedPlayer.getCollectedRewards().add(name);
+        for (String name : collectedRewards.split(","))
+            timedPlayer.getCollectedRewards().add(name);
 
         return timedPlayer;
     }
-
 }

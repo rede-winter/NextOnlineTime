@@ -13,7 +13,6 @@ import com.nextplugins.onlinetime.api.player.TimedPlayer;
 import com.nextplugins.onlinetime.api.reward.Reward;
 import com.nextplugins.onlinetime.configuration.values.FeatureValue;
 import com.nextplugins.onlinetime.configuration.values.MessageValue;
-import com.nextplugins.onlinetime.manager.CheckManager;
 import com.nextplugins.onlinetime.manager.RewardManager;
 import com.nextplugins.onlinetime.manager.TimedPlayerManager;
 import com.nextplugins.onlinetime.manager.TopTimedPlayerManager;
@@ -22,9 +21,9 @@ import com.nextplugins.onlinetime.utils.ColorUtil;
 import com.nextplugins.onlinetime.utils.ItemBuilder;
 import com.nextplugins.onlinetime.utils.TimeUtils;
 import lombok.val;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,21 +38,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class OnlineTimeView extends PagedInventory {
 
     private final Map<String, Integer> playerRewardFilter = new HashMap<>();
-
-    private final CheckManager checkManager;
     private final RewardManager rewardManager;
     private final InventoryRegistry inventoryRegistry;
     private final TimedPlayerManager timedPlayerManager;
     private final TopTimedPlayerManager topTimedPlayerManager;
 
     public OnlineTimeView() {
-        super(
-            "online-time.main",
-            "Seu tempo no servidor",
-            6 * 9
-        );
+        super("online-time.main", "Tempo Online", 6 * 9);
 
-        checkManager = NextOnlineTime.getInstance().getCheckManager();
         rewardManager = NextOnlineTime.getInstance().getRewardManager();
         inventoryRegistry = NextOnlineTime.getInstance().getInventoryRegistry();
         timedPlayerManager = NextOnlineTime.getInstance().getTimedPlayerManager();
@@ -73,59 +65,34 @@ public final class OnlineTimeView extends PagedInventory {
         val player = viewer.getPlayer();
         val timedPlayer = timedPlayerManager.getByName(player.getName());
 
-        val integer = FeatureValue.get(FeatureValue::check);
-        if (integer >= 0 && FeatureValue.get(FeatureValue::type)) {
-
-            val lore = new ArrayList<String>();
-
-            lore.add("&fCrie um cheque com uma quantidade de tempo");
-            if (integer != 0) lore.add("&fVocê perderá &e" + integer + "% &fdo tempo inserido");
-
-            editor.setItem(4, InventoryItem.of(
-                    new ItemBuilder("MrSnowDK")
-                        .name("&6Cheque de Tempo")
-                        .setLore(lore)
-                        .wrap()
-                ).defaultCallback(callback -> {
-
-                    player.closeInventory();
-                    player.sendMessage(MessageValue.get(MessageValue::checkMessage).toArray(new String[]{}));
-                    checkManager.sendCheckRequisition(player);
-
-                })
-            );
-
-        }
-
-        editor.setItem(48, InventoryItem.of(
-                new ItemBuilder(viewer.getPlayer().getName())
-                    .name("&a" + viewer.getPlayer().getName())
-                    .setLore(
-                        "&7Confira seu progresso abaixo:",
-                        "&7Total de tempo online: &f" + TimeUtils.format(timedPlayer.getTimeInServer()),
-                        "&7Recompensas coletadas: &f" + timedPlayer.getCollectedRewards().size()
-                    )
-                    .wrap()
-            )
-        );
+        editor.setItem(
+                47,
+                InventoryItem.of(new ItemBuilder(viewer.getPlayer().getName())
+                        .name("&aSeu progresso:")
+                        .setLore(
+                                "",
+                                "&7 Você possui &f" + TimeUtils.format(timedPlayer.getTimeInServer()) + " &7online.",
+                                "&7 Você coletou &f"
+                                        + timedPlayer.getCollectedRewards().size() + " &7recompensas.")
+                        .wrap()));
 
         editor.setItem(49, changeFilterInventoryItem(viewer));
 
-        editor.setItem(50, InventoryItem.of(
-                new ItemBuilder(Material.GOLD_INGOT)
-                    .name("&6TOP Online")
-                    .setLore("&fClique para ver os top jogadores", "&fonline no servidor")
-                    .wrap()
-            ).defaultCallback(callback -> {
-                    if (topTimedPlayerManager.checkUpdate()) {
-                        callback.getPlayer().sendMessage(ColorUtil.colored("&aO ranking está atualizando, aguarde."));
-                        return;
-                    }
+        editor.setItem(
+                51,
+                InventoryItem.of(new ItemBuilder(Material.GOLD_INGOT)
+                                .name("&aRanking")
+                                .setLore("&7Clique para ver os jogadores", "&7com mais tempo.")
+                                .wrap())
+                        .defaultCallback(callback -> {
+                            if (topTimedPlayerManager.checkUpdate()) {
+                                callback.getPlayer()
+                                        .sendMessage(ColorUtil.colored("&aO ranking está atualizando, aguarde."));
+                                return;
+                            }
 
-                    inventoryRegistry.getTopInventory().openInventory(callback.getPlayer());
-                }
-            )
-        );
+                            inventoryRegistry.getTopInventory().openInventory(callback.getPlayer());
+                        }));
     }
 
     @Override
@@ -158,79 +125,72 @@ public final class OnlineTimeView extends PagedInventory {
         configureInventory(viewer, viewer.getEditor());
     }
 
-    private InventoryItem rewardInventoryItem(TimedPlayer timedPlayer,
-                                              Reward reward,
-                                              List<String> lore) {
-        return InventoryItem.of(
-            new ItemBuilder(reward.getIcon())
-                .name(reward.getColoredName())
-                .setLore(lore)
-                .wrap()
-        ).defaultCallback(callback -> {
+    private InventoryItem rewardInventoryItem(TimedPlayer timedPlayer, Reward reward, List<String> lore) {
+        return InventoryItem.of(new ItemBuilder(reward.getIcon().clone())
+                        .name(reward.getColoredName())
+                        .setLore(lore)
+                        .changeItemMeta(itemMeta -> itemMeta.addItemFlags(ItemFlag.values()))
+                        .wrap())
+                .defaultCallback(callback -> {
+                    val player = callback.getPlayer();
+                    val rewardStatus = timedPlayer.canCollect(reward);
+                    if (!rewardStatus.isCanCollect()) {
+                        player.sendMessage(rewardStatus.getMessage());
+                        return;
+                    }
 
-            val player = callback.getPlayer();
-            val rewardStatus = timedPlayer.canCollect(reward);
-            if (!rewardStatus.isCanCollect()) {
-                player.sendMessage(rewardStatus.getMessage());
-                return;
-            }
+                    var avaliableSpaces = 0;
+                    for (val content : player.getInventory().getContents()) {
+                        if (content != null && content.getType() != Material.AIR) continue;
+                        ++avaliableSpaces;
+                    }
 
-            var avaliableSpaces = 0;
-            for (val content : player.getInventory().getContents()) {
-                if (content != null && content.getType() != Material.AIR) continue;
-                ++avaliableSpaces;
-            }
+                    if (avaliableSpaces < reward.getCommands().size()) {
+                        player.sendMessage(MessageValue.get(MessageValue::noSpace)
+                                .replace(
+                                        "%spaces%",
+                                        String.valueOf(reward.getCommands().size() - avaliableSpaces)));
+                        return;
+                    }
 
-            if (avaliableSpaces < reward.getCommands().size()) {
-                player.sendMessage(MessageValue.get(MessageValue::noSpace)
-                    .replace("%spaces%", String.valueOf(reward.getCommands().size() - avaliableSpaces))
-                );
-                return;
-            }
+                    player.sendMessage(MessageValue.get(MessageValue::collectedReward)
+                            .replace("%reward%", reward.getColoredName()));
 
-            player.sendMessage(
-                MessageValue.get(MessageValue::collectedReward)
-                    .replace("%reward%", reward.getColoredName())
-            );
+                    timedPlayer.getCollectedRewards().add(reward.getName());
 
-            timedPlayer.getCollectedRewards().add(reward.getName());
+                    if (FeatureValue.get(FeatureValue::type)) {
+                        timedPlayer.removeTime(reward.getTime());
+                        player.sendMessage(MessageValue.get(MessageValue::usedTime)
+                                .replace("%time%", TimeUtils.format(reward.getTime())));
+                    }
 
-            if (FeatureValue.get(FeatureValue::type)) {
-                timedPlayer.removeTime(reward.getTime());
-                player.sendMessage(MessageValue.get(MessageValue::usedTime)
-                    .replace("%time%", TimeUtils.format(reward.getTime()))
-                );
-            }
+                    callback.updateInventory();
 
-            callback.updateInventory();
-
-            for (val command : reward.getCommands()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
-            }
-        });
+                    for (val command : reward.getCommands()) {
+                        Bukkit.dispatchCommand(
+                                Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+                    }
+                });
     }
 
     private InventoryItem changeFilterInventoryItem(Viewer viewer) {
         val currentFilter = new AtomicInteger(playerRewardFilter.getOrDefault(viewer.getName(), -1));
         return InventoryItem.of(new ItemBuilder(Material.HOPPER)
-                .name("&6Filtro de recompensas")
-                .setLore(
-                    "&7Veja apenas as recompensas que deseja",
-                    "",
-                    getColorByFilter(currentFilter.get(), -1) + " Todas as recompensas",
-                    getColorByFilter(currentFilter.get(), 0) + " Recompensas liberadas",
-                    getColorByFilter(currentFilter.get(), 1) + " Recompensas bloqueadas",
-                    getColorByFilter(currentFilter.get(), 2) + " Recompensas coletadas",
-                    "",
-                    "&aClique para mudar o filtro!"
-                )
-                .wrap())
-            .defaultCallback(event -> {
-
-                playerRewardFilter.put(viewer.getName(), currentFilter.incrementAndGet() > 2 ? -1 : currentFilter.get());
-                event.updateInventory();
-
-            });
+                        .name("&aFiltro de recompensas")
+                        .setLore(
+                                "",
+                                getColorByFilter(currentFilter.get(), -1) + " Todas as recompensas",
+                                getColorByFilter(currentFilter.get(), 0) + " Recompensas liberadas",
+                                getColorByFilter(currentFilter.get(), 1) + " Recompensas bloqueadas",
+                                getColorByFilter(currentFilter.get(), 2) + " Recompensas coletadas",
+                                "",
+                                "&aClique para mudar o filtro!")
+                        .wrap())
+                .defaultCallback(event -> {
+                    playerRewardFilter.put(
+                            viewer.getName(), currentFilter.incrementAndGet() > 2 ? -1 : currentFilter.get());
+                    event.updateInventory();
+                });
     }
 
     private List<String> rewardLore(Reward reward, RewardStatus rewardStatus, List<String> list) {
@@ -240,8 +200,7 @@ public final class OnlineTimeView extends PagedInventory {
             if (line.contains("%reward_description%")) lore.addAll(reward.getDescription());
             else {
                 lore.add(line.replace("%time%", TimeUtils.format(reward.getTime()))
-                    .replace("%collect_message%", rewardStatus.getMessage())
-                );
+                        .replace("%collect_message%", rewardStatus.getMessage()));
             }
         }
 
@@ -249,7 +208,6 @@ public final class OnlineTimeView extends PagedInventory {
     }
 
     private String getColorByFilter(int currentFilter, int loopFilter) {
-        return currentFilter == loopFilter ? " &b▶" : "&8";
+        return currentFilter == loopFilter ? " &7&l▶&7" : "&8";
     }
-
 }

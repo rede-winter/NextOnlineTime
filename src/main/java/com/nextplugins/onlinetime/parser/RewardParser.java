@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 public class RewardParser {
 
     private final Configuration configuration = NextOnlineTime.getInstance().getRewardsConfig();
@@ -42,9 +41,7 @@ public class RewardParser {
 
             NextOnlineTime.getInstance().getLogger().warning("Error on parse reward " + section.getName());
             return null;
-
         }
-
     }
 
     public List<Reward> parseListSection(ConfigurationSection section) {
@@ -56,15 +53,12 @@ public class RewardParser {
             if (reward == null) continue;
 
             rewards.add(reward);
-
         }
 
         return rewards;
-
     }
 
     public List<Reward> parseFromConfig() {
         return parseListSection(configuration.getConfigurationSection(""));
     }
-
 }

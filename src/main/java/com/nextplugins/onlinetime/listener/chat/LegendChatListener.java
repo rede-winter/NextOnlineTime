@@ -29,16 +29,11 @@ public final class LegendChatListener implements Listener {
 
         val textComponent = new TextComponent(timeFormatted);
         val hoverEvent = new HoverEvent(
-            HoverEvent.Action.SHOW_TEXT,
-            TextComponent.fromLegacyText(ChatColor.GRAY + TimeUtils.format(timeInServer))
-        );
+                HoverEvent.Action.SHOW_TEXT,
+                TextComponent.fromLegacyText(ChatColor.GRAY + TimeUtils.format(timeInServer)));
 
         textComponent.setHoverEvent(hoverEvent);
 
-        event.setTag(
-            "online_time",
-            textComponent
-        );
+        event.setTag("online_time", textComponent);
     }
-
 }

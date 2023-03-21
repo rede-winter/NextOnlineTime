@@ -25,25 +25,23 @@ import java.util.UUID;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 public class NPCRunnable implements Runnable, Listener {
 
     private final Plugin plugin;
     private final NPCPool npcPool;
-    @Getter private int npcId = -1;
+
+    @Getter
+    private int npcId = -1;
 
     public NPCRunnable(Plugin plugin) {
         this.plugin = plugin;
         this.npcPool = NPCPool.builder(plugin)
-              .spawnDistance(60)
-              .actionDistance(30)
-              .tabListRemoveTicks(20)
-              .build();
+                .spawnDistance(60)
+                .actionDistance(30)
+                .tabListRemoveTicks(20)
+                .build();
 
-        this.plugin.getServer().getPluginManager().registerEvents(
-              this,
-              this.plugin
-        );
+        this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     }
 
     @Override
@@ -58,7 +56,15 @@ public class NPCRunnable implements Runnable, Listener {
      * Default spawn of npc & hologram
      */
     public void spawnDefault(Location location) {
-        Bukkit.getScheduler().runTask(this.plugin, () -> spawn(location, NPCValue.get(NPCValue::npcName), NPCValue.get(NPCValue::skinNick), NPCValue.get(NPCValue::hologramMessage), NPCValue.get(NPCValue::heightToAdd)));
+        Bukkit.getScheduler()
+                .runTask(
+                        this.plugin,
+                        () -> spawn(
+                                location,
+                                NPCValue.get(NPCValue::npcName),
+                                NPCValue.get(NPCValue::skinNick),
+                                NPCValue.get(NPCValue::hologramMessage),
+                                NPCValue.get(NPCValue::heightToAdd)));
     }
 
     /**
@@ -66,7 +72,8 @@ public class NPCRunnable implements Runnable, Listener {
      *
      * @param location to spawn the npc and hologram
      */
-    public void spawn(Location location, String npcName, String skinNick, List<String> hologramMessage, double hologramAddition) {
+    public void spawn(
+            Location location, String npcName, String skinNick, List<String> hologramMessage, double hologramAddition) {
         clear();
 
         val profile = new Profile(skinNick);
@@ -78,12 +85,13 @@ public class NPCRunnable implements Runnable, Listener {
         val pitch = location.getPitch();
 
         val npc = NPC.builder()
-              .profile(profile)
-              .location(location)
-              .imitatePlayer(false)
-              .lookAtPlayer(NPCValue.get(NPCValue::lookCLose))
-              .spawnCustomizer((spawnedNpc, player) -> spawnedNpc.rotation().queueRotate(yaw, pitch).send(player))
-              .build(this.npcPool);
+                .profile(profile)
+                .location(location)
+                .imitatePlayer(false)
+                .lookAtPlayer(NPCValue.get(NPCValue::lookCLose))
+                .spawnCustomizer((spawnedNpc, player) ->
+                        spawnedNpc.rotation().queueRotate(yaw, pitch).send(player))
+                .build(this.npcPool);
 
         npc.visibility().queueSpawn();
 
@@ -123,5 +131,4 @@ public class NPCRunnable implements Runnable, Listener {
 
         event.send(npc.metadata().queue(MetadataModifier.EntityMetadata.SKIN_LAYERS, true));
     }
-
 }

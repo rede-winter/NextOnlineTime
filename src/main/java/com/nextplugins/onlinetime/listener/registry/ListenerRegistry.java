@@ -1,7 +1,6 @@
 package com.nextplugins.onlinetime.listener.registry;
 
 import com.nextplugins.onlinetime.NextOnlineTime;
-import com.nextplugins.onlinetime.listener.CheckUseListener;
 import com.nextplugins.onlinetime.listener.UpdateCheckerListener;
 import com.nextplugins.onlinetime.listener.UserConnectListener;
 import com.nextplugins.onlinetime.listener.chat.LegendChatListener;
@@ -16,33 +15,19 @@ public final class ListenerRegistry {
         val timedPlayerManager = plugin.getTimedPlayerManager();
 
         val updateCheckerListener = new UpdateCheckerListener();
-        val checkUseListener = new CheckUseListener(timedPlayerManager);
-        val userConnectListener = new UserConnectListener(
-            timedPlayerManager,
-            plugin.getConversorManager()
-        );
+        val userConnectListener = new UserConnectListener(timedPlayerManager);
 
-        pluginManager.registerEvents(checkUseListener, plugin);
         pluginManager.registerEvents(userConnectListener, plugin);
         pluginManager.registerEvents(updateCheckerListener, plugin);
 
         if (pluginManager.isPluginEnabled("nChat")) {
-            pluginManager.registerEvents(
-                new NChatListener(
-                    timedPlayerManager
-                ),
-                plugin
-            );
+            pluginManager.registerEvents(new NChatListener(timedPlayerManager), plugin);
 
             logger.info("[Chat] Dependência 'nChat' sendo utilizada como plugin de Chat");
         } else if (pluginManager.isPluginEnabled("Legendchat")) {
-            pluginManager.registerEvents(
-                new LegendChatListener(timedPlayerManager),
-                plugin
-            );
+            pluginManager.registerEvents(new LegendChatListener(timedPlayerManager), plugin);
 
             logger.info("[Chat] Dependência 'LegendChat' sendo utilizada como plugin de Chat");
         }
     }
-
 }

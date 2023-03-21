@@ -11,7 +11,6 @@ import java.io.File;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @Data(staticConstructor = "of")
 public final class ConfigurationManager {
 
@@ -38,7 +37,6 @@ public final class ConfigurationManager {
 
         NextOnlineTime instance = NextOnlineTime.getInstance();
         return new File(instance.getDataFolder(), this.config);
-
     }
 
     /**
@@ -49,6 +47,4 @@ public final class ConfigurationManager {
     public FileConfiguration load() {
         return YamlConfiguration.loadConfiguration(getFile());
     }
-
-
 }

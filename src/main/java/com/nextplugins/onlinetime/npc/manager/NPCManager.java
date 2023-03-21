@@ -10,7 +10,6 @@ import org.bukkit.plugin.PluginManager;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 public class NPCManager {
 
     protected final NextOnlineTime plugin = NextOnlineTime.getInstance();
@@ -19,17 +18,18 @@ public class NPCManager {
     protected final String PROTOCOL_LIB = "ProtocolLib";
     protected final String HOLOGRAPHIC_DISPLAYS = "HolographicDisplays";
 
-    @Getter private boolean enabled;
-    @Getter private Runnable runnable;
+    @Getter
+    private boolean enabled;
+
+    @Getter
+    private Runnable runnable;
 
     public void init() {
         if (!MANAGER.isPluginEnabled(PROTOCOL_LIB) || !MANAGER.isPluginEnabled(HOLOGRAPHIC_DISPLAYS)) {
-            plugin.getLogger().warning(
-                String.format("Dependências não encontradas (%s, %s) O NPC não será usado.",
-                    PROTOCOL_LIB,
-                    HOLOGRAPHIC_DISPLAYS
-                )
-            );
+            plugin.getLogger()
+                    .warning(String.format(
+                            "Dependências não encontradas (%s, %s) O NPC não será usado.",
+                            PROTOCOL_LIB, HOLOGRAPHIC_DISPLAYS));
 
             return;
         }
@@ -39,5 +39,4 @@ public class NPCManager {
 
         enabled = true;
     }
-
 }

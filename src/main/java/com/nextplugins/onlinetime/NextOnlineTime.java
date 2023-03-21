@@ -6,14 +6,13 @@ import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.connector.type.impl.MySQLDatabaseType;
 import com.henryfabio.sqlprovider.connector.type.impl.SQLiteDatabaseType;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
-import com.nextplugins.onlinetime.api.conversion.impl.atlas.AtlasOnlineTimeConversor;
-import com.nextplugins.onlinetime.api.conversion.impl.victor.OnlineTimePlusConversor;
-import com.nextplugins.onlinetime.api.metric.MetricProvider;
 import com.nextplugins.onlinetime.command.OnlineTimeCommand;
 import com.nextplugins.onlinetime.configuration.ConfigurationManager;
 import com.nextplugins.onlinetime.dao.TimedPlayerDAO;
 import com.nextplugins.onlinetime.listener.registry.ListenerRegistry;
-import com.nextplugins.onlinetime.manager.*;
+import com.nextplugins.onlinetime.manager.RewardManager;
+import com.nextplugins.onlinetime.manager.TimedPlayerManager;
+import com.nextplugins.onlinetime.manager.TopTimedPlayerManager;
 import com.nextplugins.onlinetime.npc.manager.NPCManager;
 import com.nextplugins.onlinetime.npc.runnable.NPCRunnable;
 import com.nextplugins.onlinetime.parser.ItemParser;
@@ -52,10 +51,8 @@ public final class NextOnlineTime extends JavaPlugin {
     private TimedPlayerDAO timedPlayerDAO;
 
     private NPCManager npcManager;
-    private CheckManager checkManager;
     private RewardManager rewardManager;
     private InventoryRegistry inventoryRegistry;
-    private ConversorManager conversorManager;
     private TimedPlayerManager timedPlayerManager;
     private TopTimedPlayerManager topTimedPlayerManager;
 
@@ -76,7 +73,8 @@ public final class NextOnlineTime extends JavaPlugin {
 
         messagesConfig = ConfigurationManager.of("messages.yml").saveDefault().load();
         rewardsConfig = ConfigurationManager.of("rewards.yml").saveDefault().load();
-        conversorsConfig = ConfigurationManager.of("conversors.yml").saveDefault().load();
+        conversorsConfig =
+                ConfigurationManager.of("conversors.yml").saveDefault().load();
         npcConfig = ConfigurationManager.of("npc.yml").saveDefault().load();
     }
 
@@ -95,7 +93,9 @@ public final class NextOnlineTime extends JavaPlugin {
             getLogger().info("[NextUpdate] Baixe aqui: " + lastRelease.getDownloadURL());
             getLogger().info("");
         } else {
-            getLogger().info("[NextUpdate] Olá! Vim aqui revisar se a versão do NextOnlineTime está atualizada, e pelo visto sim! Obrigado por usar nossos plugins!");
+            getLogger()
+                    .info(
+                            "[NextUpdate] Olá! Vim aqui revisar se a versão do NextOnlineTime está atualizada, e pelo visto sim! Obrigado por usar nossos plugins!");
         }
 
         InventoryManager.enable(this);
@@ -106,9 +106,7 @@ public final class NextOnlineTime extends JavaPlugin {
         npcManager = new NPCManager();
         rewardManager = new RewardManager();
         inventoryRegistry = new InventoryRegistry();
-        conversorManager = new ConversorManager(timedPlayerDAO);
         timedPlayerManager = new TimedPlayerManager(timedPlayerDAO);
-        checkManager = new CheckManager();
         topTimedPlayerManager = new TopTimedPlayerManager(timedPlayerDAO);
         updatePlayerTimeTask = new UpdatePlayerTimeTask(timedPlayerManager);
 
@@ -117,21 +115,16 @@ public final class NextOnlineTime extends JavaPlugin {
         rewardManager.loadRewards();
         timedPlayerDAO.createTable();
 
-        checkManager.init();
         inventoryRegistry.init();
         npcManager.init();
 
         val pluginManager = Bukkit.getPluginManager();
         configurePlaceholder(pluginManager);
-        loadConversors();
-        loadCheckItem();
         registerTopUpdaterTask();
 
         getCommand("tempo").setExecutor(new OnlineTimeCommand());
 
         new ListenerRegistry(this);
-
-        MetricProvider.of(this).register();
 
         loadTime.stop();
         getLogger().log(Level.INFO, "Plugin inicializado com sucesso. ({0})", loadTime);
@@ -147,61 +140,25 @@ public final class NextOnlineTime extends JavaPlugin {
         }
     }
 
-    private void loadCheckItem() {
-        checkManager.setCheckItem(itemParser.parseSection(
-            getConfig().getConfigurationSection("checkItem")
-        ));
-    }
-
-    private void loadConversors() {
-        val atlasConversor = "AtlasTempoOnline";
-        if (conversorsConfig.getBoolean(atlasConversor + ".use")) {
-            val section = conversorsConfig.getConfigurationSection(atlasConversor);
-            val connector = configureSqlProvider(section);
-
-            val conversor = new AtlasOnlineTimeConversor(
-                atlasConversor,
-                section.getString("connection.table"),
-                connector
-            );
-
-            conversorManager.registerConversor(conversor);
-        }
-
-        val onlineTimePlusConversor = "OnlineTimePlus";
-        if (conversorsConfig.getBoolean(onlineTimePlusConversor + ".use")) {
-            val section = conversorsConfig.getConfigurationSection(onlineTimePlusConversor);
-            val connector = configureSqlProvider(section);
-
-            val conversor = new OnlineTimePlusConversor(
-                onlineTimePlusConversor,
-                section.getString("connection.table"),
-                connector
-            );
-
-            conversorManager.registerConversor(conversor);
-        }
-    }
-
     private SQLConnector configureSqlProvider(ConfigurationSection section) {
         SQLConnector connector;
         if (section.getBoolean("connection.mysql.enable")) {
             val mysqlSection = section.getConfigurationSection("connection.mysql");
 
             connector = MySQLDatabaseType.builder()
-                .address(mysqlSection.getString("address"))
-                .username(mysqlSection.getString("username"))
-                .password(mysqlSection.getString("password"))
-                .database(mysqlSection.getString("database"))
-                .build()
-                .connect();
+                    .address(mysqlSection.getString("address"))
+                    .username(mysqlSection.getString("username"))
+                    .password(mysqlSection.getString("password"))
+                    .database(mysqlSection.getString("database"))
+                    .build()
+                    .connect();
         } else {
             val sqliteSection = section.getConfigurationSection("connection.sqlite");
 
             connector = SQLiteDatabaseType.builder()
-                .file(new File(sqliteSection.getString("file")))
-                .build()
-                .connect();
+                    .file(new File(sqliteSection.getString("file")))
+                    .build()
+                    .connect();
         }
 
         return connector;
@@ -220,12 +177,7 @@ public final class NextOnlineTime extends JavaPlugin {
         val timeFormat = parseTime(getConfig().getString("timeFormat"));
         val updateTimeInTicks = timeFormat.toSeconds(updaterTime) * 20;
 
-        scheduler.runTaskTimerAsynchronously(
-            this,
-            updatePlayerTimeTask,
-            updateTimeInTicks,
-            updateTimeInTicks
-        );
+        scheduler.runTaskTimerAsynchronously(this, updatePlayerTimeTask, updateTimeInTicks, updateTimeInTicks);
     }
 
     private TimeUnit parseTime(String string) {
@@ -234,5 +186,4 @@ public final class NextOnlineTime extends JavaPlugin {
         if (timeUnit != TimeUnit.HOURS && timeUnit != TimeUnit.MINUTES) return TimeUnit.MINUTES;
         return timeUnit;
     }
-
 }

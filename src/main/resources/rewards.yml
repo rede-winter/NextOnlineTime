@@ -1,13 +1,9 @@
 reward1:
   name: '&cPacote inicial'
   description:
-    - '&7Utilize este pacote para começar'
-    - '&7sua jogatina no servidor'
-    - ''
-    - '&fItens:'
-    - ''
-    - '&8- &72500 coins'
-    - '&8- &7Picareta de Ferro'
+    - '&7 Recompensas:'
+    - '&8  - &2$&f2.5k de coins'
+    - '&8  - &6$&f'
   time: 5 # in minutes
   material: IRON_PICKAXE
   glow: true
@@ -15,38 +11,3 @@ reward1:
   commands:
     - 'coins add %player% 2500'
     - 'give %player% iron_pickaxe'
-
-reward2:
-  name: '&cPacote inicial 2'
-  description:
-    - '&7Utilize este pacote para melhorar'
-    - '&7seus equipamentos'
-    - ''
-    - '&fItens:'
-    - ''
-    - '&8- &75000 coins'
-    - '&8- &7Picareta de Diamante'
-  time: 15 # in minutes
-  material: DIAMOND_PICKAXE
-  data: 0
-  commands:
-    - 'coins add %player% 5000'
-    - 'give %player% diamond_pickaxe'
-
-reward3:
-  name: '&cPacote inicial VIP 1'
-  permission: 'vip.usar'
-  description:
-    - '&7Utilize este pacote para melhorar'
-    - '&7seus equipamentos'
-    - ''
-    - '&fItens:'
-    - ''
-    - '&8- &715000 coins'
-    - '&8- &7Picareta de Diamante'
-  time: 15 # in minutes
-  material: DIAMOND_PICKAXE
-  data: 0
-  commands:
-    - 'coins add %player% 15000'
-    - 'give %player% diamond_pickaxe'

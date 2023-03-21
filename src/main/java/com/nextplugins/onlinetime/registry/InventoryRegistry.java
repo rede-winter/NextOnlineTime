@@ -8,7 +8,6 @@ import lombok.Getter;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @Getter
 public class InventoryRegistry {
 
@@ -19,7 +18,5 @@ public class InventoryRegistry {
 
         mainInventory = new OnlineTimeView().init();
         topInventory = new TopOnlineTimeView().init();
-
     }
-
 }

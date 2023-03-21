@@ -26,16 +26,15 @@ public class UpdateCheckerListener implements Listener {
 
         val newVersionComponent = new TextComponent(String.format(
                 " Uma nova versão do NextOnlineTime está disponível (%s » %s)",
-                updateChecker.getCurrentVersion(),
-                lastRelease.getVersion()
-        ));
+                updateChecker.getCurrentVersion(), lastRelease.getVersion()));
 
         val downloadComponent = new TextComponent(" Clique aqui para ir até o local de download.");
         val channelComponent = new TextComponent(TextComponent.fromLegacyText(ColorUtil.colored(
-                " &7Canal de atualização: " + getChannel(lastRelease.isPreRelease() || lastRelease.isDraft()))
-        ));
+                " &7Canal de atualização: " + getChannel(lastRelease.isPreRelease() || lastRelease.isDraft()))));
 
-        val hoverText = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ColorUtil.colored("&7Este link irá levar até o github do plugin")));
+        val hoverText = new HoverEvent(
+                HoverEvent.Action.SHOW_TEXT,
+                TextComponent.fromLegacyText(ColorUtil.colored("&7Este link irá levar até o github do plugin")));
         val clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, lastRelease.getDownloadURL());
 
         newVersionComponent.setColor(ChatColor.GREEN);
@@ -53,17 +52,20 @@ public class UpdateCheckerListener implements Listener {
         val spigotPlayer = player.spigot();
 
         // avoid chat cleaners when join
-        Bukkit.getScheduler().runTaskLater(NextOnlineTime.getInstance(), () -> {
-            player.sendMessage("");
-            spigotPlayer.sendMessage(newVersionComponent);
-            spigotPlayer.sendMessage(downloadComponent);
-            spigotPlayer.sendMessage(channelComponent);
-            player.sendMessage("");
-        }, 5 * 20L);
+        Bukkit.getScheduler()
+                .runTaskLater(
+                        NextOnlineTime.getInstance(),
+                        () -> {
+                            player.sendMessage("");
+                            spigotPlayer.sendMessage(newVersionComponent);
+                            spigotPlayer.sendMessage(downloadComponent);
+                            spigotPlayer.sendMessage(channelComponent);
+                            player.sendMessage("");
+                        },
+                        5 * 20L);
     }
 
     private String getChannel(boolean betaChannel) {
         return betaChannel ? "&6Beta" : "&aEstável";
     }
-
 }

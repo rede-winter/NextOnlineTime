@@ -11,7 +11,6 @@ import java.lang.reflect.Constructor;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ActionBarUtils {
 
@@ -20,8 +19,12 @@ public class ActionBarUtils {
         try {
 
             Object handle = player.getClass().getMethod("getHandle").invoke(player);
-            Object playerConnection = handle.getClass().getField("playerConnection").get(handle);
-            playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
+            Object playerConnection =
+                    handle.getClass().getField("playerConnection").get(handle);
+            playerConnection
+                    .getClass()
+                    .getMethod("sendPacket", getNMSClass("Packet"))
+                    .invoke(playerConnection, packet);
 
         } catch (Exception e) {
 
@@ -53,7 +56,9 @@ public class ActionBarUtils {
         try {
 
             Constructor<?> ConstructorActionbar = packetActionbar.getDeclaredConstructor(chatComponent, byte.class);
-            Object actionbar = chatSerializer.getMethod("a", String.class).invoke(chatSerializer, "{\"text\": \"" + message + "\"}");
+            Object actionbar = chatSerializer
+                    .getMethod("a", String.class)
+                    .invoke(chatSerializer, "{\"text\": \"" + message + "\"}");
             Object packet = ConstructorActionbar.newInstance(actionbar, (byte) 2);
             sendPacket(player, packet);
 

@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @Data
 public class TopTimedPlayerManager {
 
@@ -36,5 +35,4 @@ public class TopTimedPlayerManager {
 
         return true;
     }
-
 }

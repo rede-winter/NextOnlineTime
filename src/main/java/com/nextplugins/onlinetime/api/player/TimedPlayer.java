@@ -1,7 +1,7 @@
 package com.nextplugins.onlinetime.api.player;
 
-import com.nextplugins.onlinetime.api.reward.Reward;
 import com.nextplugins.onlinetime.api.models.enums.RewardStatus;
+import com.nextplugins.onlinetime.api.reward.Reward;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,16 +12,18 @@ import java.util.List;
  * @author Yuhtin
  * Github: https://github.com/Yuhtin
  */
-
 @Data
 @Builder
 public class TimedPlayer {
 
-    @Builder.Default private List<String> collectedRewards = new ArrayList<>();
+    @Builder.Default
+    private List<String> collectedRewards = new ArrayList<>();
+
     private String name;
     private long lastUpdateTime;
 
-    @Builder.Default private long timeInServer = 0;
+    @Builder.Default
+    private long timeInServer = 0;
 
     public synchronized void addTime(long time) {
         this.timeInServer += time;
@@ -38,5 +40,4 @@ public class TimedPlayer {
 
         return RewardStatus.CAN_COLLECT;
     }
-
 }

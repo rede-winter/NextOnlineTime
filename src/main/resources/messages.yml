@@ -5,29 +5,27 @@ check-message:
   - ''
 
 command-help:
-  - '&6&lTEMPO ONLINE &fAjuda'
+  - '&a&lTEMPO'
   - ''
-  - ' &e/%label% ver <jogador> &7| &fVer o tempo online de um jogador específico.'
-  - ' &e/%label% menu &7| &fAbrir o menu de recompensas.'
-  - ' &e/%label% enviar <jogador> <tempo> &7| &fEnviar tempo de jogo à algum jogador.' # permissão: nextonlinetime.sendtime
+  - ' &a/%label% &8- &7Abrir o menu de recompensas.'
+  - ' &a/%label% ver <jogador> &8- &7Ver o tempo online de um jogador específico.'
   - ''
 
 command-help-admin:
-  - '&6&lTEMPO ONLINE &fAjuda'
+  - '&a&lTEMPO'
   - ''
-  - ' &e/%label% ver <jogador> &7| &fVer o tempo online de um jogador específico.'
-  - ' &e/%label% menu &7| &fAbrir o menu de recompensas.'
-  - ' &e/%label% enviar <jogador> <tempo> &7| &fEnviar tempo de jogo à algum jogador.' # permissão: nextonlinetime.sendtime
-  - ' &e/%label% setnpc &7| &fSetar a posição do npc de tempo online' # permissão: nextonlinetime.admin
-  - ' &e/%label% delnpc &7| &fDeletar o npc de tempo online' # permissão: nextonlinetime.admin
+  - ' &a/%label% &8- &7Abrir o menu de recompensas.'
+  - ' &a/%label% ver <jogador> &8- &7Ver o tempo online de um jogador específico.'
+  - ' &a/%label% setnpc &8- &7Setar a posição do npc de tempo online' # permissão: nextonlinetime.admin
+  - ' &a/%label% delnpc &8- &7Deletar o npc de tempo online' # permissão: nextonlinetime.admin
   - ''
 
-incorrect-usage: '&cUtilize /{usage}.'
+incorrect-usage: '&cUso correto:&7 /{usage}.'
 cant-send-for-you: '&cVocê não pode enviar tempo para si mesmo.'
 offline-player: '&cEste jogador não está online.'
 
 time-of-target: '&aO jogador &f%target% &apossui &f%time% &ano servidor.'
-collected-reward: "&aYEAH! Você coletou a recompensa &f'%reward%&f' &acom sucesso."
+collected-reward: "&a&lGG! Recompensa coletada com sucesso!"
 used-time: '&aVocê utilizou &f%time% &apara receber a recompensa.'
 no-space: '&cVocê precisa ter mais %spaces% no inventário.'
 check-created: '&aCheque de tempo criado com sucesso.'
@@ -35,21 +33,20 @@ check-no-time: '&cAcabou o tempo para criar o cheque.'
 check-activated: '&aVocê ativou um cheque com &f%time%&a.'
 
 invalid-time: '&cO tempo inserido é inválido, formato válido, 1d3h2m, 25s, 1w, 3w2d (3 semanas, 2 dias).'
-no-time: '&cVocê não tem esta quantidade de tempo online.'
+no-time: '&cVocê não possui todo este tempo online.'
 
 sendTime:
   sended: '&aVocê enviou %time% para o jogador %target%.'
   received: '&aVocê recebeu %time% do jogador %sender%.'
 
 rewardInfo:
-  already-collected: '&cVocê já coletou este prêmio antes.'
-  no-time-collect: '&eVocê não tem tempo suficiente para coletar este prêmio.'
+  already-collected: '&cVocê já coletou esta recompensa antes.'
+  no-time-collect: '&eVocê não possui tempo online suficiente.'
   canCollect: '&aClique aqui para coletar este prêmio.'
   reward-lore:
     - ''
-    - '&fInformações:'
+    - '&7 Necessário: &f%time%'
     - ''
     - '%reward_description%'
     - ''
-    - '&7Tempo necessário: &f%time%'
     - '%collect_message%'

@@ -1,11 +1,9 @@
 package com.nextplugins.onlinetime.command;
 
 import com.nextplugins.onlinetime.NextOnlineTime;
-import com.nextplugins.onlinetime.api.conversion.Conversor;
 import com.nextplugins.onlinetime.api.player.TimedPlayer;
 import com.nextplugins.onlinetime.configuration.ConfigurationManager;
 import com.nextplugins.onlinetime.configuration.values.MessageValue;
-import com.nextplugins.onlinetime.manager.ConversorManager;
 import com.nextplugins.onlinetime.manager.TimedPlayerManager;
 import com.nextplugins.onlinetime.npc.manager.NPCManager;
 import com.nextplugins.onlinetime.npc.runnable.NPCRunnable;
@@ -24,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Yuhtin
@@ -32,13 +29,15 @@ import java.util.Set;
  */
 public final class OnlineTimeCommand implements CommandExecutor {
 
-    private final TimedPlayerManager timedPlayerManager = NextOnlineTime.getInstance().getTimedPlayerManager();
-    private final ConversorManager conversorManager = NextOnlineTime.getInstance().getConversorManager();
-    private final InventoryRegistry inventoryRegistry = NextOnlineTime.getInstance().getInventoryRegistry();
+    private final TimedPlayerManager timedPlayerManager =
+            NextOnlineTime.getInstance().getTimedPlayerManager();
+    private final InventoryRegistry inventoryRegistry =
+            NextOnlineTime.getInstance().getInventoryRegistry();
     private final NPCManager npcManager = NextOnlineTime.getInstance().getNpcManager();
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(
+            @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Este comando apenas pode ser executado por jogadores.");
             return true;
@@ -47,14 +46,7 @@ public final class OnlineTimeCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         if (args.length == 0) {
-            List<String> messages = sender.hasPermission("nextonlinetime.admin")
-                ? MessageValue.get(MessageValue::helpMessageAdmin)
-                : MessageValue.get(MessageValue::helpMessage);
-
-            for (String message : messages) {
-                player.sendMessage(message.replace("%label%", "tempo"));
-            }
-
+            inventoryRegistry.getMainInventory().openInventory(player);
             return true;
         }
 
@@ -79,87 +71,22 @@ public final class OnlineTimeCommand implements CommandExecutor {
             }
 
             player.sendMessage(MessageValue.get(MessageValue::timeOfTarget)
-                .replace("%target%", name)
-                .replace("%time%", TimeUtils.format(timedPlayer.getTimeInServer()))
-            );
+                    .replace("%target%", name)
+                    .replace("%time%", TimeUtils.format(timedPlayer.getTimeInServer())));
 
             return true;
         }
 
-        // menu
+        // help
 
-        if (subCommand.equalsIgnoreCase("menu")) {
-            inventoryRegistry.getMainInventory().openInventory(player);
-            return true;
-        }
+        if (subCommand.equalsIgnoreCase("help")) {
+            List<String> messages = sender.hasPermission("nextonlinetime.admin")
+                    ? MessageValue.get(MessageValue::helpMessageAdmin)
+                    : MessageValue.get(MessageValue::helpMessage);
 
-        // send
-
-        if (subCommand.equalsIgnoreCase("enviar")) {
-            if (!player.hasPermission("nextonlinetime.sendtime")) {
-                player.sendMessage(ChatColor.RED + "Você não tem permissão para utilizar este comando");
-                return true;
+            for (String message : messages) {
+                player.sendMessage(message.replace("%label%", "tempo"));
             }
-
-            if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Você deve especificar um jogador alvo.");
-                return true;
-            }
-
-            Player target;
-
-            try {
-                target = Bukkit.getPlayer(args[1]);
-            } catch (Throwable ignored) {
-                player.sendMessage(ChatColor.RED + "O jogador alvo é invalido.");
-                return true;
-            }
-
-            if (args.length < 3) {
-                player.sendMessage(ChatColor.RED + "Você deve especificar um jogador alvo.");
-                return true;
-            }
-
-            String time;
-
-            try {
-                time = args[2];
-            } catch (Throwable ignored) {
-                player.sendMessage(ChatColor.RED + "Você deve especificar uma quantia de tempo válida.");
-                return true;
-            }
-
-            if (player == target) {
-                player.sendMessage(MessageValue.get(MessageValue::cantSendForYou));
-                return true;
-            }
-
-            long timeInMillis = TimeUtils.unformat(time);
-            if (timeInMillis < 1) {
-                player.sendMessage(MessageValue.get(MessageValue::invalidTime));
-                return true;
-            }
-
-            TimedPlayer timedPlayer = timedPlayerManager.getByName(player.getName());
-            if (timedPlayer.getTimeInServer() < timeInMillis) {
-                player.sendMessage(MessageValue.get(MessageValue::noTime));
-                return true;
-            }
-
-            TimedPlayer timedTarget = timedPlayerManager.getByName(target.getName());
-
-            timedTarget.addTime(timeInMillis);
-            timedPlayer.removeTime(timeInMillis);
-
-            player.sendMessage(MessageValue.get(MessageValue::sendedTime)
-                .replace("%time%", TimeUtils.format(timeInMillis))
-                .replace("%target%", target.getName())
-            );
-
-            target.sendMessage(MessageValue.get(MessageValue::receivedTime)
-                .replace("%time%", TimeUtils.format(timeInMillis))
-                .replace("%sender%", player.getName())
-            );
 
             return true;
         }
@@ -188,7 +115,8 @@ public final class OnlineTimeCommand implements CommandExecutor {
                 player.sendMessage(ColorUtil.colored("&aNPC setado com sucesso."));
 
             } catch (Exception exception) {
-                player.sendMessage(ColorUtil.colored("&cNão foi possível setar o npc, o sistema está desabilitado por falta de dependência."));
+                player.sendMessage(ColorUtil.colored(
+                        "&cNão foi possível setar o npc, o sistema está desabilitado por falta de dependência."));
             }
 
             return true;
@@ -223,72 +151,6 @@ public final class OnlineTimeCommand implements CommandExecutor {
             return true;
         }
 
-        // conversor
-
-        if (subCommand.equalsIgnoreCase("conversor")) {
-            if (!player.hasPermission("nextonlinetime.admin")) {
-                player.sendMessage(ChatColor.RED + "Você não tem permissão para utilizar este comando");
-                return true;
-            }
-
-            final String conversor = args[1];
-
-            Conversor pluginConversor = checkConversor(sender, conversor);
-
-            if (pluginConversor == null) return true;
-
-            player.sendMessage(ColorUtil.colored(
-                "&aIniciando conversão de dados do plugin " + pluginConversor.getConversorName() + "."
-            ));
-
-            long initial = System.currentTimeMillis();
-            conversorManager.setConverting(true);
-
-            Set<TimedPlayer> timedPlayers = pluginConversor.lookupPlayers();
-            if (timedPlayers == null) {
-
-                player.sendMessage(ColorUtil.colored(
-                    "&cOcorreu um erro, veja se configurou corretamente o conversor."
-                ));
-                return true;
-
-            }
-
-            conversorManager.startConversion(
-                player,
-                timedPlayers,
-                pluginConversor.getConversorName(),
-                initial
-            );
-        }
-
-        return false;
+        return true;
     }
-
-    private Conversor checkConversor(CommandSender sender, String conversor) {
-        if (conversorManager.isConverting()) {
-            sender.sendMessage(ColorUtil.colored(
-                "&cVocê já está convertendo uma tabela, aguarde a finalização da mesma."
-            ));
-            return null;
-        }
-
-        final int maxPlayers = sender instanceof Player ? 1 : 0;
-        if (Bukkit.getOnlinePlayers().size() > maxPlayers) {
-            sender.sendMessage(ColorUtil.colored(
-                "&cEsta função só pode ser usada com apenas você online."
-            ));
-            return null;
-        }
-
-        Conversor pluginConversor = conversorManager.getByName(conversor);
-        if (pluginConversor == null) {
-            sender.sendMessage(ColorUtil.colored(
-                "&cEste conversor é inválido, conversores válidos: " + conversorManager.availableConversors()
-            ));
-        }
-
-        return pluginConversor;
-    }
-
 }
